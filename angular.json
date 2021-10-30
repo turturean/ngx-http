@@ -1,0 +1,154 @@
+{
+  "version": 1,
+  "projects": {
+    "ngx-http": {
+      "projectType": "library",
+      "root": "libs/ngx-http",
+      "sourceRoot": "libs/ngx-http/src",
+      "prefix": "ngx-http-app",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/ngx-http"],
+          "options": {
+            "jestConfig": "libs/ngx-http/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/ngx-http/src/**/*.ts",
+              "libs/ngx-http/src/**/*.html"
+            ]
+          }
+        }
+      },
+      "tags": []
+    },
+    "ngx-http-app": {
+      "projectType": "application",
+      "root": "apps/ngx-http-app",
+      "sourceRoot": "apps/ngx-http-app/src",
+      "prefix": "ngx-http-app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/ngx-http-app",
+            "index": "apps/ngx-http-app/src/index.html",
+            "main": "apps/ngx-http-app/src/main.ts",
+            "polyfills": "apps/ngx-http-app/src/polyfills.ts",
+            "tsConfig": "apps/ngx-http-app/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "apps/ngx-http-app/src/favicon.ico",
+              "apps/ngx-http-app/src/assets"
+            ],
+            "styles": ["apps/ngx-http-app/src/styles.scss"],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "apps/ngx-http-app/src/environments/environment.ts",
+                  "with": "appsngx-http-app/src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "browserTarget": "ngx-http-app:build:production"
+            },
+            "development": {
+              "browserTarget": "ngx-http-app:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "ngx-http-app:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/ngx-http-app/src/**/*.ts",
+              "apps/ngx-http-app/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/ngx-http"],
+          "options": {
+            "jestConfig": "apps/ngx-http-app/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
+    },
+    "ngx-http-e2e": {
+      "root": "apps/ngx-http-app-e2e",
+      "sourceRoot": "apps/ngx-http-app-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/ngx-http-app-e2e/cypress.json",
+            "devServerTarget": "ngx-http:serve:development",
+            "tsConfig": "apps/ngx-http-app-e2e/tsconfig.json"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "ngx-http:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["apps/ngx-http-app-e2e/**/*.{js,ts}"]
+          }
+        }
+      },
+      "tags": [],
+      "implicitDependencies": ["ngx-http-app"]
+    }
+  }
+}
