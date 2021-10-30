@@ -1,5 +1,6 @@
-import {Component, OnDestroy} from '@angular/core';
-import { NgxHttpService } from '../../../../libs/ngx-http/src/lib/ngx-http.service';
+import { Component, OnDestroy } from '@angular/core';
+import { NgxHttpClientService, NgxHttpService } from '@ngx-http-app/ngx-http';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'ngx-http-root',
@@ -8,31 +9,50 @@ import { NgxHttpService } from '../../../../libs/ngx-http/src/lib/ngx-http.servi
 })
 export class AppComponent implements OnDestroy {
   title = 'ngx-http';
-  userStream;
-  constructor(private ngxHttp: NgxHttpService) {
+  constructor(
+    private ngxHttp: NgxHttpService,
+    private http: HttpClient,
+    private ngxHttpClient: NgxHttpClientService
+  ) {
+    // this.ngxHttpClient
+    //   .watchGet<{id: string}[]>('http://localhost:3000/test')
+    //   .subscribe(({ data, loading, err }) => {
+    //     if (loading) {
+    //       console.log('Is loading', loading);
+    //     } else if (err) {
+    //       console.log('Error', err);
+    //     } else if (!loading) {
+    //       console.log('Done', data);
+    //     }
+    //   });
 
-    this.userStream = this.ngxHttp.get<{ id: string }, any>('/users', {
-      success: (data) => data,
-    });
+    const userStream = this.ngxHttp.streamGet<{ id: string }>('http://localhost:3000/test');
 
-    this.userStream.data$.subscribe((res) => {
-      const {data, loading, error} = res;
+    userStream.data$.subscribe((res) => {
+      const { data, loading, err } = res;
 
-      if (error) {
-        console.error(error)
-      } else {
-        console.log(data);
+      if (loading) {
+        console.log('Is loading', loading)
+      } else if(err) {
+        console.log('Error', err)
+      } else if(!loading) {
+        console.log('Done', data)
       }
     });
-    this.userStream.filter$.subscribe((filter) => {
-      console.log(filter);
-    });
+    userStream.fetch({});
+    // userStream.refetch();
 
-    this.userStream.fetch({});
-    this.userStream.refetch();
+    // this.http
+    //   .get('http://localhost:3000/test', {
+    //     observe: 'events',
+    //     reportProgress: true,
+    //   })
+    //   .subscribe((res) => {
+    //     console.log('Res', res);
+    //   });
   }
 
   ngOnDestroy() {
-    this.userStream.destroy();
+    // this.userStream.destroy();
   }
 }

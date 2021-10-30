@@ -13,7 +13,7 @@
     "lib": ["es2017", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "baseUrl": "./ngx-http",
+    "baseUrl": ".",
     "paths": {
       "@ngx-http-app/ngx-http": ["libs/ngx-http/src/index.ts"]
     }
