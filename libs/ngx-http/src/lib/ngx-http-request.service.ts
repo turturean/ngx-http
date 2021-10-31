@@ -1,53 +1,31 @@
-import { HttpClient } from '@angular/common/http';
-import {BehaviorSubject, Subject} from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { ReturnWatchTypes } from './ngx-http.types';
 
-import { NgxHttpError, NgxHttpMethod } from './ngx-http.types';
-import {map} from "rxjs/operators";
-
-export class NgxHttpRequestService<D> {
-  public data$: Subject<Partial<{ data: any; loading: boolean; err: any }>> = new Subject();
+export class NgxHttpRequestService<D, P extends any[]> {
+  public data$: Subject<Partial<ReturnWatchTypes<D>>> = new Subject();
 
   constructor(
-    private http: HttpClient,
-    private httpArgs: any[],
-    private method: NgxHttpMethod,
+    private url: string,
+    private args: P[],
+    private requester: (url: string, ...args: P[]) => Observable<D>
   ) {}
 
-  fetch(filter = {}) {
-    switch (this.method) {
-      case NgxHttpMethod.GET:
-        {
-          this.data$.next({ loading: true, err: null });
-          this.http
-            .get<D>(this.httpArgs[0], ...this.httpArgs.slice(1))
-            .pipe(
-              map((data) => {
+  fetch(...args: P) {
+    this.data$.next({ loading: true, err: null });
+    this.args = args && args.length ? args : this.args;
 
-              })
-            )
-            .subscribe(
-              (data) =>
-                this.data$.next({
-                  loading: false,
-                  data: data, // this.options.success(data),
-                }),
-              (error) =>
-                this.data$.next({
-                  loading: false,
-                  err: new NgxHttpError(error),
-                  data: null, // this.options.failed(new NgxHttpError(error)),
-                })
-            );
-        }
-        break;
-    }
-  }
-
-  refetch() {
-    // this.fetch(this.filter$.value);
-  }
-
-
-  destroy() {
+    this.requester(this.url, ...this.args).subscribe(
+      (data) =>
+        this.data$.next({
+          loading: false,
+          data: data, // this.options.success(data),
+        }),
+      (err) =>
+        this.data$.next({
+          loading: false,
+          err: err,
+          data: undefined, // this.options.failed(new NgxHttpError(error)),
+        })
+    );
   }
 }

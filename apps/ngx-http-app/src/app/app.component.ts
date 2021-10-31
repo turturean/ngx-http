@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { NgxHttpClientService, NgxHttpService } from '@ngx-http-app/ngx-http';
-import { HttpClient } from '@angular/common/http';
+import { HttpParams } from '@angular/common/http';
 
 @Component({
   selector: 'ngx-http-root',
@@ -11,22 +11,20 @@ export class AppComponent implements OnDestroy {
   title = 'ngx-http';
   constructor(
     private ngxHttp: NgxHttpService,
-    private http: HttpClient,
     private ngxHttpClient: NgxHttpClientService
   ) {
-    // this.ngxHttpClient
-    //   .watchGet<{id: string}[]>('http://localhost:3000/test')
-    //   .subscribe(({ data, loading, err }) => {
-    //     if (loading) {
-    //       console.log('Is loading', loading);
-    //     } else if (err) {
-    //       console.log('Error', err);
-    //     } else if (!loading) {
-    //       console.log('Done', data);
-    //     }
-    //   });
+    this.ngxHttpClient
+      .get<{id: string}[]>('http://localhost:3000/test', {
+        params: (new HttpParams()).set('test', 34)
+      })
+      .subscribe(({ data, loading, err }) => {
+        console.log(`Data:${String(data)} loading: ${Boolean(loading)}  error: ${String(err)}`);
+      });
 
-    const userStream = this.ngxHttp.streamGet<{ id: string }>('http://localhost:3000/test');
+    const userStream = this.ngxHttp.post<{ id: string }[]>('http://localhost:3000/test',
+      {
+        params: (new HttpParams()).set('test2', 34)
+      });
 
     userStream.data$.subscribe((res) => {
       const { data, loading, err } = res;
@@ -39,20 +37,10 @@ export class AppComponent implements OnDestroy {
         console.log('Done', data)
       }
     });
-    userStream.fetch({});
-    // userStream.refetch();
 
-    // this.http
-    //   .get('http://localhost:3000/test', {
-    //     observe: 'events',
-    //     reportProgress: true,
-    //   })
-    //   .subscribe((res) => {
-    //     console.log('Res', res);
-    //   });
+    userStream.fetch({});
   }
 
   ngOnDestroy() {
-    // this.userStream.destroy();
   }
 }

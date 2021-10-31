@@ -1,24 +1,24 @@
-export enum NgxHttpMethod {
-  POST = 'post',
-  GET = 'get',
-  PUT = 'put',
-  DELETE = 'delete',
-  jsonp = 'jsonp',
-}
+import {HttpClient} from "@angular/common/http";
 
-export class NgxHttpOptions<S, F> {
-  cache?: boolean = false;
-  pooling?: boolean = false;
-  success? = (data: S): S | null => data ? data : null;
-  failed? = (err: F): F | null => err ? err :  null;
-}
+export type ArgumentTypes<F extends Function> = F extends (url: string, ...args: infer A) => any
+  ? A
+  : never;
+export type ReturnWatchTypes<D> = {
+  data: D;
+  loading: boolean;
+  err: null;
+};
 
-export class NgxHttpError {
-  date: Date;
-  error: any;
+export type GetType = ArgumentTypes<typeof HttpClient.prototype.get>;
+export type PostType = ArgumentTypes<typeof HttpClient.prototype.post>;
+export type PutType = ArgumentTypes<typeof HttpClient.prototype.put>;
+export type DeleteType = ArgumentTypes<typeof HttpClient.prototype.delete>;
+export type PatchType = ArgumentTypes<typeof HttpClient.prototype.patch>;
 
-  constructor(error: any) {
-    this.date = new Date();
-    this.error = error;
-  }
+export enum HttpMethod {
+  Post,
+  Get,
+  Put,
+  Delete,
+  Patch
 }
